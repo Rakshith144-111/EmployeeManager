@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.ExampleDemo.DTO.EmployeeDTo;
 import com.example.ExampleDemo.Service.EmployeeService;
 import com.example.ExampleDemo.table.Employee;
 
@@ -27,7 +28,7 @@ public class JavaController {
 	}
 	
 	@PostMapping("/addEmployee")
-	public String AddEmployee(@RequestBody Employee emp)
+	public String AddEmployee(@RequestBody EmployeeDTo emp)
 	{
 		return employeeService.addEmployee(emp);
 	}

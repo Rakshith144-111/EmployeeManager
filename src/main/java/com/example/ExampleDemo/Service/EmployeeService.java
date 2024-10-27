@@ -6,8 +6,11 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.ExampleDemo.DTO.EmployeeDTo;
 import com.example.ExampleDemo.Exception.EmployeeIdMissingException;
+import com.example.ExampleDemo.Repository.DepartmentRepository;
 import com.example.ExampleDemo.Repository.EmployeeRepository;
+import com.example.ExampleDemo.table.Department;
 import com.example.ExampleDemo.table.Employee;
 
 @Service
@@ -16,12 +19,15 @@ public class EmployeeService {
 	@Autowired
 	private EmployeeRepository empRepo;
 	
+	@Autowired
+	private DepartmentRepository deptRepo;
+	
 	public List<Employee> getAllEmp()
 	{
 		 return (List<Employee>) empRepo.findAll();
 	}
 
-	public String addEmployee(Employee emp) {
+	public String addEmployee(EmployeeDTo emp) {
 		// TODO Auto-generated method stub
 		if(emp.getEmployeeId()== 0)
 		{
@@ -29,7 +35,33 @@ public class EmployeeService {
 		}
 		if(empRepo.findByFirstName(emp.getFirstName()).isPresent())
 			return "Employee Already Exists";
-		empRepo.save(emp);
+		
+		Employee employee = new Employee();
+		employee.setAge(emp.getAge());
+		employee.setEmployeeId(emp.getEmployeeId());
+		employee.setFirstName(emp.getFirstName());
+		employee.setLastName(emp.getLastName());
+		
+		//EmployeeDTo eDto = new EmployeeDTo();
+		
+		// Associate the Employee with a Department
+		Optional<Department> optionalDepartment = deptRepo.findById(emp.getDepartmentId());
+
+		if (optionalDepartment.isPresent()) {
+		    Department department = optionalDepartment.get();
+		    
+		    // Check if any specific field of the department is null, if needed
+		    if (department.getDepartment() == null) { // Assuming 'getDepartmentName()' is a method in your Department class
+		        return "Department found, but the name is missing.";
+		    }
+		    
+		    // Associate the Employee with the Department
+		    employee.setDepartment(department);
+		} else {
+		    return "Department not found"; // Return message if the department does not exist
+		}
+		
+	    empRepo.save(employee);
 		return "Employee Added Succesfully";
 	}
 

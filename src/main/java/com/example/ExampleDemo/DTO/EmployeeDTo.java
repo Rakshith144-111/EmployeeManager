@@ -12,7 +12,7 @@ public class EmployeeDTo {
 	
 	private int age;
 	
-	private String departmentId;
+	private int departmentId;
 
 	public int getEmployeeId() {
 		return employeeId;
@@ -46,11 +46,11 @@ public class EmployeeDTo {
 		this.age = age;
 	}
 
-	public String getDepartmentId() {
+	public int getDepartmentId() {
 		return departmentId;
 	}
 
-	public void setDepartmentId(String departmentId) {
+	public void setDepartmentId(int departmentId) {
 		this.departmentId = departmentId;
 	}
 	
