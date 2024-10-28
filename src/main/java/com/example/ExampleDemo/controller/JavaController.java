@@ -45,9 +45,8 @@ public class JavaController {
 	 }
 	 
 	 @PostMapping("/addMultipleEmployees")
-	 public String addingMulEmployees(@RequestBody List<Employee> Employees)
-	 {
-		 return employeeService.AddMultipleEmployees(Employees);
+	 public String addingMulEmployees(@RequestBody List<EmployeeDTo> employeeDtos) {
+	     return employeeService.AddMultipleEmployees(employeeDtos);
 	 }
 	
 

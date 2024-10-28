@@ -28,42 +28,31 @@ public class EmployeeService {
 	}
 
 	public String addEmployee(EmployeeDTo emp) {
-		// TODO Auto-generated method stub
-		if(emp.getEmployeeId()== 0)
-		{
-			throw new EmployeeIdMissingException("Employee Id need to be provided");
-		}
-		if(empRepo.findByFirstName(emp.getFirstName()).isPresent())
-			return "Employee Already Exists";
-		
-		Employee employee = new Employee();
-		employee.setAge(emp.getAge());
-		employee.setEmployeeId(emp.getEmployeeId());
-		employee.setFirstName(emp.getFirstName());
-		employee.setLastName(emp.getLastName());
-		
-		//EmployeeDTo eDto = new EmployeeDTo();
-		
-		// Associate the Employee with a Department
-		Optional<Department> optionalDepartment = deptRepo.findById(emp.getDepartmentId());
+        if (emp.getEmployeeId() == 0) {
+            throw new EmployeeIdMissingException("Employee Id needs to be provided");
+        }
+        if (empRepo.findByFirstName(emp.getFirstName()).isPresent()) {
+            return "Employee Already Exists";
+        }
 
-		if (optionalDepartment.isPresent()) {
-		    Department department = optionalDepartment.get();
-		    
-		    // Check if any specific field of the department is null, if needed
-		    if (department.getDepartment() == null) { // Assuming 'getDepartmentName()' is a method in your Department class
-		        return "Department found, but the name is missing.";
-		    }
-		    
-		    // Associate the Employee with the Department
-		    employee.setDepartment(department);
-		} else {
-		    return "Department not found"; // Return message if the department does not exist
-		}
-		
-	    empRepo.save(employee);
-		return "Employee Added Succesfully";
-	}
+        Employee employee = new Employee();
+        employee.setAge(emp.getAge());
+        employee.setEmployeeId(emp.getEmployeeId());
+        employee.setFirstName(emp.getFirstName());
+        employee.setLastName(emp.getLastName());
+
+        // Use departmentId from EmployeeDTo to fetch the department
+        Optional<Department> optionalDepartment = deptRepo.findByDepartmentId(emp.getDepartmentId());
+        
+        if (optionalDepartment.isPresent()) {
+            employee.setDepartment(optionalDepartment.get());
+        } else {
+            return "Department not found"; // Return message if the department does not exist
+        }
+
+        empRepo.save(employee);
+        return "Employee Added Successfully";
+    }
 
 	public String deleteTheEmployee(int emplId) {
         Optional<Employee> employee = empRepo.findByEmployeeId(emplId);
@@ -88,28 +77,37 @@ public class EmployeeService {
 	        return employees.size() + " employees deleted with last name: " + lastName;
 	    }
 
-	public String AddMultipleEmployees(List<Employee> employees) {
-		
-		StringBuilder str = new StringBuilder();
-		
-		for(Employee employee : employees)
-		{
-			if(employee.getEmployeeId() == 0)
-			{
-				str.append("Please provide the Employement id for"+employee.getFirstName()+"\n");
-				continue;
-			}
-			
-			if(empRepo.findByEmployeeId(employee.getEmployeeId()).isPresent())
-			{
-				str.append("User with Employee Id"+employee.getEmployeeId()+"already exists .PLease regoster with diffrent Employee Id"+"\n");
-				continue;
-			}
-			
-			empRepo.save(employee);
-			str.append("Employee with Id"+employee.getEmployeeId()+" added Succesfully"+"\n");
-		}
-		
-		return str.toString();
-	}
+	  public String AddMultipleEmployees(List<EmployeeDTo> employeeDtos) {
+	        StringBuilder str = new StringBuilder();
+	        
+	        for (EmployeeDTo empDto : employeeDtos) {
+	            if (empDto.getEmployeeId() == 0) {
+	                str.append("Please provide the Employee ID for " + empDto.getFirstName() + "\n");
+	                continue;
+	            }
+	            
+	            if (empRepo.findByEmployeeId(empDto.getEmployeeId()).isPresent()) {
+	                str.append("User with Employee ID " + empDto.getEmployeeId() + " already exists. Please register with a different Employee ID\n");
+	                continue;
+	            }
+
+	            // Map EmployeeDTo to Employee and set department
+	            Employee employee = new Employee();
+	            employee.setAge(empDto.getAge());
+	            employee.setEmployeeId(empDto.getEmployeeId());
+	            employee.setFirstName(empDto.getFirstName());
+	            employee.setLastName(empDto.getLastName());
+	            
+	            Optional<Department> optionalDepartment = deptRepo.findByDepartmentId(empDto.getDepartmentId());
+	            if (optionalDepartment.isPresent()) {
+	                employee.setDepartment(optionalDepartment.get());
+	                empRepo.save(employee);
+	                str.append("Employee with ID " + employee.getEmployeeId() + " added successfully\n");
+	            } else {
+	                str.append("Department for employee " + employee.getFirstName() + " not found\n");
+	            }
+	        }
+	        
+	        return str.toString();
+	    }
 }

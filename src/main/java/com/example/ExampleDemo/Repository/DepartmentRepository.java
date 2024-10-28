@@ -15,4 +15,6 @@ public interface DepartmentRepository extends CrudRepository<Department, Integer
 
 	Optional<Department> findById(int departmentId);
 
+	Optional<Department> findByDepartmentId(int departmentId);
+
 }
